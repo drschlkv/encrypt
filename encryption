@@ -1,0 +1,100 @@
+def encryption(size, key, line, count): # type - содержание блока, key - ключ, symbol - строка, count - длина размера блока
+    if size == 'символ':
+        if len(key) == len(line):
+            line_new = [""]*len(line)
+            j = 0
+            for i in key:
+                line_new[int(i)] = line[j]
+                j += 1
+            return ''.join(line_new)
+        elif k_len < len(s):
+            line_div = wrap(line, len(key))     # деление строки на длину ключа   
+            line_new = []
+            while(len(line_div[-1]) < len(key)):
+                line_div[-1] += '0'
+            for i in line_div:
+                line_new.append(encryption('символ', key, i, count))
+            return ''.join(line_new)
+    elif size == 'группа символов':
+        line_div = wrap(line, 2)
+        line_new = [""] * len(line_div)
+        j = 0
+        for i in key:
+            line_new[int(i)] = line_div[j]
+            j += 1
+        return ''.join(line_new)
+    elif size == 'слово':
+        line_div = line.split(' ')
+        line_new = [""]*len(line_div)
+        j = 0
+        for i in key:
+            line_new[int(i)] = line_div[j] + " "
+            j += 1
+        return ''.join(line_new)
+
+def decryption(size, key, line, count):
+    if size == 'символ':
+        key_len = len(key)
+        if key_len == len(line):
+            line_new = ""
+            for i in key:
+                line_new += line[int(i)]
+            return line_new
+        elif key_len < len(line):
+            line_div = wrap(line, key_len)
+            line_new = ""
+            while (len(line_div[-1]) < key_len):
+                line_div[-1] += '\0'
+            for i in line_div:
+                line_new += decryption('символ', key, i, count)
+            i = len(line_new)-1
+            while(line_new[i] == '0'):
+                line_new = line_new[:len(line_new)-1]
+                i -= 1
+            return line_new
+    elif size == 'группа символов':
+        line_div = wrap(line, count)
+        line_new = ""
+        for i in key:
+            line_new += line_div[int(i)]
+        return line_new
+    elif size == 'слово':
+        line_div = line.split(' ')
+        line_new = ""
+        for i in key:
+            line_new += line_div[int(i)] + " "
+        return line_new
+
+change =input("Шифрование или дешифрование?")
+size=input('Что содержит блок (символ,группа символов,слово)')
+symbol = input("Введите строку для шифрования: ")
+key = input("Введите ключ: ") 
+if size == 'символ': 
+    if change =='шифрование':
+        print("Шифрование прошло успешно: ", encryption(size, key, symbol, 0))
+    elif change =='дешифрование':
+        print("Расшифровка прошла успешно: ", decryption(size, key, symbol, 0))
+
+elif size == 'группа символов': # реализовано только длина размера блока 2
+    q = int(input("Введите размер группы символов: "))
+    while (len(symbol) % q != 0):
+        print("Размер группы должен быть кратен кол-ву символов в строке (" + str(len(symbol)) + ")")
+        q = int(input("Введите ещё раз: "))
+    while(Check(key, len(symbol)//q) == False):  
+        print("Ключ должен быть перестановкой чисел от 0 до i, где i - кол-во групп (" + str(len(symbol)//q) + ")")
+        key = input("Введите ещё раз: ")
+    if change == 'шифрование':
+        print("Шифрование прошло успешно: ", encryption(size, key, symbol, q))
+    elif change == 'дешифрование':
+        print("Расшифровка прошла успешно: ", decryption(size, key, symbol, q))
+    
+elif size == 'слово':
+    while (Check(key, len(symbol.split(' '))) == False):
+        print("Ключ должен быть перестановкой чисел от 0 до i, где i - кол-во слов (" + str(len(symbol.split(' '))) + ")")
+        key = input("Введите ещё раз: ")
+    if change == 'шифрование':
+        print("Шифрование прошло успешно: ", encryption(size, key, symbol, 0))
+    elif change == 'дешифрование':
+        print("Расшифровка прошла успешно: ", decryption(size, key, symbol, 0))
+else:
+    print("Вы ввели неправильное значение")
